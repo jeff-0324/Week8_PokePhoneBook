@@ -6,14 +6,25 @@
 //
 
 import UIKit
+import SnapKit
 
-class ViewController: UIViewController {
+class MainViewController: UIViewController {
+    
+    private let mainView = MainView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+     
+        configureUI()
     }
 
+    private func configureUI() {
+        view.addSubview(mainView)
+        
+        mainView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
 
 }
 
