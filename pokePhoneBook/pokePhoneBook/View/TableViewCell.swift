@@ -12,30 +12,29 @@ class TableViewCell: UITableViewCell {
     
     var pokemonImageView: UIImageView = {
         let imageView = UIImageView()
-        imageView.backgroundColor = .gray
         imageView.clipsToBounds = true
+        imageView.layer.cornerRadius = 30
+        imageView.layer.borderWidth = 2
+        imageView.layer.borderColor = UIColor.gray.cgColor
         return imageView
     }()
     
     var friendName: UILabel = {
         let label = UILabel()
+        label.textAlignment = .left
         return label
     }()
     
     var friendNumber: UILabel = {
         let label = UILabel()
+        label.textAlignment = .center
         return label
     }()
     
-    private let stackView: UIStackView = {
-        let stackView = UIStackView()
-        stackView.axis = .horizontal
-        stackView.distribution = .fillEqually
-        return stackView
-    }()
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
+        
         configureUI()
     }
     
@@ -43,30 +42,30 @@ class TableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    
     private func configureUI() {
-        contentView.addSubview(stackView)
         [
             pokemonImageView,
             friendName,
             friendNumber
-        ].forEach{stackView.addArrangedSubview($0)}
-        
-        stackView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
-        }
+        ].forEach{contentView.addSubview($0)}
         
         pokemonImageView.snp.makeConstraints { make in
-            make.width.height.equalTo(50)
-               make.leading.equalToSuperview().offset(10)
-               make.centerY.equalToSuperview()
+            make.width.height.equalTo(60)
+            make.leading.equalToSuperview().offset(10)
+            make.centerY.equalToSuperview()
         }
         
         friendName.snp.makeConstraints { make in
-            make.leading.equalTo(pokemonImageView.snp.trailing).inset(-20)
-            
+            make.width.equalTo(70)
+            make.centerY.equalToSuperview()
+            make.leading.equalTo(pokemonImageView.snp.trailing).offset(20)
         }
         
-        
+        friendNumber.snp.makeConstraints { make in
+            make.width.equalTo(150)
+            make.centerY.equalToSuperview()
+            make.leading.equalTo(friendName.snp.trailing).offset(30)
+        }
     }
-    
 }
