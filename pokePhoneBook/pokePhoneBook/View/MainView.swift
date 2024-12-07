@@ -82,11 +82,14 @@ extension MainView {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return dataSource.friendsList.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "TableViewCell", for: indexPath) as? TableViewCell else { return UITableViewCell() }
+        let friend = dataSource.friendsList[indexPath.row]
+        cell.friendName.text = friend.0
+        cell.friendNumber.text = friend.1
         
         return cell
     }
