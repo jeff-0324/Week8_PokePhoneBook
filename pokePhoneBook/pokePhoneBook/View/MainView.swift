@@ -9,6 +9,7 @@ import SnapKit
 
 class MainView: UIView, UITableViewDataSource, UITableViewDelegate {
     private let dataSource = DataSource()
+    var buttonAction: (()->Void)?
  
     private let topLabel: UILabel = {
         let label = UILabel()
@@ -65,6 +66,13 @@ class MainView: UIView, UITableViewDataSource, UITableViewDelegate {
             make.top.equalTo(topLabel.snp.bottom).offset(20)
             make.leading.trailing.bottom.equalToSuperview().inset(30)
         }
+        
+        addButton.addTarget(self, action: #selector(tappedAddButton), for: .touchUpInside)
+        
+    }
+    
+    @objc func tappedAddButton() {
+        buttonAction?()
     }
 }
 
