@@ -21,17 +21,24 @@ class EnrolView: UIView {
         let button = UIButton()
         button.setTitle("랜덤 이미지 생성", for: .normal)
         button.setTitleColor(.lightGray, for: .normal)
+        button.titleLabel?.font = .boldSystemFont(ofSize: 14)
         return button
     }()
     
     private var nameTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "이름을 입력해주세요"
+        textField.layer.borderWidth = 1
+        textField.layer.borderColor = UIColor.gray.cgColor
+        textField.layer.cornerRadius = 10
         return textField
     }()
     
     private var phoneNumeberTextView: UITextView = {
         let textView = UITextView()
+        textView.layer.borderWidth = 1
+        textView.layer.borderColor = UIColor.gray.cgColor
+        textView.layer.cornerRadius = 10
         return textView
     }()
     
