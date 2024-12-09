@@ -9,8 +9,14 @@ import UIKit
 import SnapKit
 
 class MainViewController: UIViewController {
-    
     private let mainView = MainView()
+    private let rightButton: UIBarButtonItem = {
+        let barButton = UIBarButtonItem()
+        barButton.title = "추가"
+        barButton.style = .plain
+        barButton.tintColor = .lightGray
+        return barButton
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,17 +25,25 @@ class MainViewController: UIViewController {
     }
 
     private func configureUI() {
+        view.backgroundColor = .white
+        
         view.addSubview(mainView)
-        
-        mainView.buttonAction = {[weak self] in
-            guard let self = self else { return }
-            self.navigationController?.pushViewController(PhoneBookViewController(), animated: true)
-        }
-        
+        navigationItem.title = "친구 목록"
+        navigationItem.rightBarButtonItem = rightButton
+       
         mainView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.top.equalToSuperview()
+            make.leading.equalToSuperview()
+            make.trailing.equalToSuperview()
+            make.bottom.equalToSuperview()
         }
+        
+        rightButton.target = self
+        rightButton.action = #selector(tappedAddButton)
     }
-
+    
+    @objc func tappedAddButton() {
+        navigationController?.pushViewController(PhoneBookViewController(), animated: true)
+    }
 }
 
