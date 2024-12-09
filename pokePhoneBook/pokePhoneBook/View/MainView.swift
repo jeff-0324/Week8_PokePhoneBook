@@ -38,10 +38,11 @@ class MainView: UIView, UITableViewDataSource, UITableViewDelegate {
     }
 }
 
+//MARK: - 메서드 Part
 extension MainView {
     
+    // tablveView setting
     func setTableView() {
-        
         listTableView.dataSource = self
         listTableView.delegate = self
         listTableView.register(TableViewCell.self, forCellReuseIdentifier: "TableViewCell")
