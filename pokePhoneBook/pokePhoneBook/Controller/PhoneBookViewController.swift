@@ -8,6 +8,7 @@
 import UIKit
 import SnapKit
 import Alamofire
+import CoreData
 
 class PhoneBookViewController: UIViewController {
     private let enrolView = EnrolView()
@@ -40,6 +41,7 @@ class PhoneBookViewController: UIViewController {
 //MARK: - 메서드 부분
 extension PhoneBookViewController {
     
+    // navigation bar setup
     private func navigationBarSetup() {
         navigationItem.title = "연락처 추가"
         navigationItem.rightBarButtonItem = rightButton

@@ -10,6 +10,7 @@ import SnapKit
 
 class MainViewController: UIViewController {
     private let mainView = MainView()
+    private let coreData = CoreDataManger()
     
     // navigationBar button
     private let rightButton: UIBarButtonItem = {
@@ -26,6 +27,10 @@ class MainViewController: UIViewController {
         
         configureUI()
         navigationBarSetup()
+        
+        coreData.coreDataSetup()
+        coreData.createData(name: "jeff", phoneNumber: "010-0000-0000")
+        coreData.readAllData()
     }
     
     private func configureUI() {
