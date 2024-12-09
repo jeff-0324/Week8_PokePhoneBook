@@ -9,7 +9,10 @@ import SnapKit
 
 class EnrolView: UIView {
     
-    private let pokemonImageView: UIImageView = {
+    // 클로저를 통한 버튼구현
+    var tappedMakeImageButton: (() -> Void)?
+    
+    let pokemonImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.layer.borderWidth = 2
         imageView.layer.borderColor = UIColor.gray.cgColor
@@ -42,7 +45,7 @@ class EnrolView: UIView {
         return textView
     }()
     
-    
+    //MARK: - setting
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -52,6 +55,7 @@ class EnrolView: UIView {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
     
     private func configureUI() {
         backgroundColor = .white
@@ -88,5 +92,15 @@ class EnrolView: UIView {
             make.leading.equalToSuperview().offset(20)
             make.height.equalTo(50)
         }
+        
+        
+        creatImageButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+    }
+}
+
+extension EnrolView {
+    
+    @objc func buttonTapped() {
+        tappedMakeImageButton?()
     }
 }
