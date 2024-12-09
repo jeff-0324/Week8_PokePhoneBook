@@ -9,21 +9,6 @@ import SnapKit
 
 class MainView: UIView, UITableViewDataSource, UITableViewDelegate {
     private let dataSource = DataSource()
-    var buttonAction: (()->Void)?
- 
-    private let topLabel: UILabel = {
-        let label = UILabel()
-        label.text = "친구 목록"
-        label.font = .boldSystemFont(ofSize: 20)
-        return label
-    }()
-    
-    private let addButton: UIButton = {
-        let button = UIButton()
-        button.setTitle("추가", for: .normal)
-        button.setTitleColor(.lightGray, for: .normal)
-        return button
-    }()
     
     private let listTableView: UITableView  = {
         let tableView = UITableView()
@@ -44,35 +29,12 @@ class MainView: UIView, UITableViewDataSource, UITableViewDelegate {
     private func configureUI() {
         backgroundColor = .white
         
-        [
-            topLabel,
-            addButton,
-            listTableView
-        ].forEach { addSubview($0) }
-        
-        topLabel.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(80)
-            make.centerX.equalToSuperview()
-            make.height.equalTo(40)
-        }
-        
-        addButton.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(80)
-            make.trailing.equalToSuperview().inset(30)
-            make.width.equalTo(40)
-        }
+        addSubview(listTableView)
         
         listTableView.snp.makeConstraints { make in
-            make.top.equalTo(topLabel.snp.bottom).offset(20)
+            make.top.equalToSuperview()
             make.leading.trailing.bottom.equalToSuperview().inset(30)
         }
-        
-        addButton.addTarget(self, action: #selector(tappedAddButton), for: .touchUpInside)
-        
-    }
-    
-    @objc func tappedAddButton() {
-        buttonAction?()
     }
 }
 
