@@ -22,15 +22,16 @@ class MainViewController: UIViewController {
     }()
     
 //MARK: - setting
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        mainView.loadData()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         configureUI()
         navigationBarSetup()
-        
-        coreData.coreDataSetup()
-        coreData.createData(name: "jeff", phoneNumber: "010-0000-0000")
-        coreData.readAllData()
     }
     
     private func configureUI() {
@@ -48,7 +49,7 @@ class MainViewController: UIViewController {
 }
 
 //MARK: - 메서드 부분
-extension MainViewController  {
+extension MainViewController: PhoneBookViewControllerDelegate  {
     
     private func navigationBarSetup() {
         navigationItem.title = "친구 목록"
@@ -62,4 +63,9 @@ extension MainViewController  {
     @objc func tappedAddButton() {
         navigationController?.pushViewController(PhoneBookViewController(), animated: true)
     }
+    
+    func didSaveData() {
+        let fetchedData = CoreDataManger.shared.fetchDataSource()
+            mainView.dataSource = fetchedData
+       }
 }

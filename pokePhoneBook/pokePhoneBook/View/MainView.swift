@@ -8,18 +8,21 @@ import UIKit
 import SnapKit
 
 class MainView: UIView, UITableViewDataSource, UITableViewDelegate {
-    private let dataSource = DataSource()
     
-    private let listTableView: UITableView  = {
+    var dataSource: [DataSource] = []
+    
+    let listTableView: UITableView  = {
         let tableView = UITableView()
         return tableView
     }()
-    
+  
+//MARK: - setting
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         configureUI()
         setTableView()
+        loadData()
     }
     
     required init?(coder: NSCoder) {
@@ -38,8 +41,13 @@ class MainView: UIView, UITableViewDataSource, UITableViewDelegate {
     }
 }
 
-//MARK: - 메서드 Part
+//MARK: - method Part
 extension MainView {
+    
+    func loadData() {
+        dataSource = CoreDataManger.shared.fetchDataSource()
+        listTableView.reloadData()
+    }
     
     // tablveView setting
     func setTableView() {
@@ -53,15 +61,19 @@ extension MainView {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return dataSource.friendsList.count
+        return dataSource.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "TableViewCell", for: indexPath) as? TableViewCell else { return UITableViewCell() }
-        let friend = dataSource.friendsList[indexPath.row]
-        cell.friendName.text = friend.0
-        cell.friendNumber.text = friend.1
         
+        let data = dataSource[indexPath.row]
+        cell.friendName.text = data.name
+        cell.friendNumber.text = data.phoneNumber
+        
+        if let imageData = data.profilesImage, let image = UIImage(data: imageData) {
+            cell.pokemonImageView.image = image
+        }
         return cell
     }
     

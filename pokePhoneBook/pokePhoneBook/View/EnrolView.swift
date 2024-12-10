@@ -9,6 +9,10 @@ import SnapKit
 
 class EnrolView: UIView {
     
+    var inputName: String = ""
+    var inputPhoneNumber: String = ""
+    var inputProfilesImage: Data?
+    
     // 클로저를 통한 버튼구현
     var tappedMakeImageButton: (() -> Void)?
     
@@ -34,17 +38,21 @@ class EnrolView: UIView {
         textField.layer.borderWidth = 1
         textField.layer.borderColor = UIColor.gray.cgColor
         textField.layer.cornerRadius = 10
+        textField.clearButtonMode = .always
+        textField.returnKeyType = .done
         return textField
     }()
-    
-    private var phoneNumeberTextView: UITextView = {
-        let textView = UITextView()
-        textView.layer.borderWidth = 1
-        textView.layer.borderColor = UIColor.gray.cgColor
-        textView.layer.cornerRadius = 10
-        return textView
+    private var phoneNumeberTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "전화번호를 입력해주세요"
+        textField.layer.borderWidth = 1
+        textField.layer.borderColor = UIColor.gray.cgColor
+        textField.layer.cornerRadius = 10
+        textField.clearButtonMode = .always
+        textField.returnKeyType = .done
+        return textField
     }()
-    
+        
     //MARK: - setting
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -56,7 +64,6 @@ class EnrolView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
     private func configureUI() {
         backgroundColor = .white
         
@@ -64,7 +71,7 @@ class EnrolView: UIView {
             pokemonImageView,
             creatImageButton,
             nameTextField,
-            phoneNumeberTextView
+            phoneNumeberTextField
         ].forEach { addSubview($0) }
         
         pokemonImageView.snp.makeConstraints { make in
@@ -86,21 +93,36 @@ class EnrolView: UIView {
             make.height.equalTo(50)
         }
         
-        phoneNumeberTextView.snp.makeConstraints { make in
+        phoneNumeberTextField.snp.makeConstraints { make in
             make.top.equalTo(nameTextField.snp.bottom).offset(10)
             make.centerX.equalToSuperview()
             make.leading.equalToSuperview().offset(20)
             make.height.equalTo(50)
         }
         
-        
+        nameTextField.delegate = self
+        phoneNumeberTextField.delegate = self
         creatImageButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
     }
 }
 
-extension EnrolView {
+//MARK: - method Part
+extension EnrolView: UITextFieldDelegate {
     
+    // 이미지 생성 버튼 메서드
     @objc func buttonTapped() {
         tappedMakeImageButton?()
+    }
+    
+    // 텍스트 필드에 있는 값을 변수에 저장
+    func inputData() {
+        inputName = nameTextField.text ?? ""
+        inputPhoneNumber = phoneNumeberTextField.text ?? ""
+    }
+    
+    // 텍스트 필드 입력이 마쳐지면 키보드가 내려가는 메서드
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }

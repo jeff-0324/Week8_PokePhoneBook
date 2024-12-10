@@ -2,7 +2,7 @@
 //  PhoneBook+CoreDataClass.swift
 //  pokePhoneBook
 //
-//  Created by jae hoon lee on 12/9/24.
+//  Created by jae hoon lee on 12/10/24.
 //
 //
 
@@ -15,5 +15,6 @@ public class PhoneBook: NSManagedObject {
     public enum Key {
         static let name = "name"
         static let phoneNumber = "phoneNumber"
+        static let profilesImage = "profilesImage"
     }
 }
