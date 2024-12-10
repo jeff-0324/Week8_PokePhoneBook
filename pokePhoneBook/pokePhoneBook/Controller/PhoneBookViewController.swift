@@ -7,10 +7,16 @@
 
 import UIKit
 import SnapKit
-import Alamofire
+
+protocol PhoneBookViewControllerDelegate: AnyObject {
+    func didSaveData()
+}
 
 class PhoneBookViewController: UIViewController {
     private let enrolView = EnrolView()
+    private let profilesImageManager = ProfilesImageManager()
+    
+    weak var delegate: PhoneBookViewControllerDelegate?
     
     // navigationBar button
     private let rightButton: UIBarButtonItem = {
@@ -20,7 +26,7 @@ class PhoneBookViewController: UIViewController {
         return barButton
     }()
     
-//MARK: - setting
+    //MARK: - setting
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -40,57 +46,35 @@ class PhoneBookViewController: UIViewController {
 //MARK: - 메서드 부분
 extension PhoneBookViewController {
     
+    // navigation bar setup
     private func navigationBarSetup() {
         navigationItem.title = "연락처 추가"
         navigationItem.rightBarButtonItem = rightButton
         
         rightButton.target = self
-        rightButton.action = #selector(tappedAddButton)
+        rightButton.action = #selector(tappedApplyButton)
         
-        enrolView.tappedMakeImageButton = {[weak self] in
+        enrolView.tappedMakeImageButton = { [weak self] in
             guard let self = self else { return }
-            fetchPokemonApi()
+            self.profilesImageManager.fetchPokemonApi { [weak self] image in
+                guard let self = self else { return }
+                if let image = image {
+                    self.enrolView.pokemonImageView.image = image
+                    self.enrolView.inputProfilesImage = UIImage.pngData(image)()
+                }
+            }
         }
     }
     
     // button action
-    @objc func tappedAddButton() {
+    @objc func tappedApplyButton() {
+        enrolView.inputData()
+        guard let profilesImage = enrolView.inputProfilesImage else {
+            print("Profiles image is missing")
+            return
+        }
+        CoreDataManger.shared.createData(name: enrolView.inputName, phoneNumber: enrolView.inputPhoneNumber, profilesImage: profilesImage)
+        delegate?.didSaveData()
         navigationController?.popViewController(animated: true)
-    }
-}
-
-// Networking part
-extension PhoneBookViewController {
-    
-    // 범용적인 네트워킹 함수
-    private func fetchData<T: Decodable>(url: URL, completion: @escaping (Result<T, AFError>) -> Void) {
-        AF.request(url).responseDecodable(of: T.self) { response in
-            completion(response.result)
-        }
-    }
-    
-    // pokemon api 요청 함수
-    private func fetchPokemonApi() {
-        let urlAdress = "https://pokeapi.co/api/v2/pokemon/"
-        let randomNum = String(Int.random(in: 1...1000))
-        
-        guard let url = URL(string: urlAdress + randomNum) else {return}
-        
-        fetchData(url: url) { [weak self] (result: Result<PokemonData, AFError>) in
-            guard let self else { return }
-            switch result {
-            case .success(let result) :
-                guard let imageUrl = URL(string: result.sprites.frontDefault) else { return }
-                AF.request(imageUrl).responseData { response in
-                    if let data = response.data, let image = UIImage(data: data) {
-                        DispatchQueue.main.async {
-                            self.enrolView.pokemonImageView.image = image
-                        }
-                    }
-                }
-            case .failure(let error) :
-                print("데이터 로드에 실패 \(error)")
-            }
-        }
     }
 }

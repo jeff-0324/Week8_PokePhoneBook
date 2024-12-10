@@ -31,7 +31,7 @@ class TableViewCell: UITableViewCell {
         return label
     }()
     
-    
+//MARK: - setting
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
