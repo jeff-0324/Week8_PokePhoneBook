@@ -10,7 +10,7 @@ import CoreData
 
 class CoreDataManger {
     
-    var container: NSPersistentContainer!
+    // 싱글톤 형식으로 사용
     static let shared = CoreDataManger()
     
     // 코어 데이터 삭제
@@ -39,92 +39,44 @@ class CoreDataManger {
     //        }()
     //
     
-    init() {
-        coreDataSetup()
+    init() {}
+    
+    // CoreData 세팅
+    var container: NSPersistentContainer {
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        return appDelegate.persistentContainer
     }
     
-    func coreDataSetup() {
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        self.container = appDelegate.persistentContainer
+    var context: NSManagedObjectContext {
+        return container.viewContext
+    }
+    var phoneBookEntity: NSEntityDescription? {
+        return NSEntityDescription.entity(forEntityName: PhoneBook.className, in: context)
+    }
+    
+    func saveContext() {
+        do {
+            try context.save()
+        } catch {
+            print(error.localizedDescription)
+        }
     }
     
     // coreData에 create
-    func createData(name: String, phoneNumber: String, profilesImage: Data) {
-        guard let entity = NSEntityDescription.entity(forEntityName: PhoneBook.className, in: self.container.viewContext) else { return }
+    func createData(_ dataSource: DataSource) {
+        guard let entity = phoneBookEntity else { return }
         
-        let newPhoneBook = NSManagedObject(entity: entity, insertInto: self.container.viewContext)
-        newPhoneBook.setValue(name, forKey: PhoneBook.Key.name)
-        newPhoneBook.setValue(phoneNumber, forKey: PhoneBook.Key.phoneNumber)
-        newPhoneBook.setValue(profilesImage, forKey: PhoneBook.Key.profilesImage)
-        
-        do {
-            try self.container.viewContext.save()
-            print("save success")
-        } catch {
-            print("save failure")
-        }
+        let newPhoneBook = NSManagedObject(entity: entity, insertInto: context)
+        newPhoneBook.setValue(dataSource.name, forKey: PhoneBook.Key.name)
+        newPhoneBook.setValue(dataSource.phoneNumber, forKey: PhoneBook.Key.phoneNumber)
+        newPhoneBook.setValue(dataSource.profilesImage, forKey: PhoneBook.Key.profilesImage)
+        saveContext()
     }
     
-    // coreData에서 read
-    func readAllData() {
-        do {
-            let phoneBooks = try self.container.viewContext.fetch(PhoneBook.fetchRequest())
-            
-            for phoneBook in phoneBooks as [NSManagedObject] {
-                if let name = phoneBook.value(forKey: PhoneBook.Key.name) as? String,
-                   let phoneNumber = phoneBook.value(forKey: PhoneBook.Key.phoneNumber) as? String,
-                   let profilesImage = phoneBook.value(forKey: PhoneBook.Key.profilesImage) as? Data {
-                    print("name: \(name), phoneNumber: \(phoneNumber), profileImage: \(profilesImage)")
-                }
-            }
-        } catch {
-            print("data read failure")
-        }
-    }
-    
-//    // coreData에 update
-//    func updateData(currentName: String, updateName: String) {
-//        
-//        let fetchRequset = PhoneBook.fetchRequest()
-//        fetchRequset.predicate = NSPredicate(format: "name == %@", currentName)
-//        
-//        do {
-//            let result = try self.container.viewContext.fetch(fetchRequset)
-//            
-//            for data in result as [NSManagedObject] {
-//                data.setValue(updateName, forKey: PhoneBook.Key.name)
-//            }
-//            try self.container.viewContext.save()
-//            print("data update success")
-//        } catch {
-//            print("data update fail")
-//        }
-//    }
-//    
-//    // coreData에서 delete
-//    func deleteData(name: String) {
-//        
-//        let fetchRequset = PhoneBook.fetchRequest()
-//        fetchRequset.predicate = NSPredicate(format: "name == %@", name)
-//        
-//        do {
-//            let result = try self.container.viewContext.fetch(fetchRequset)
-//            
-//            for data in result as [NSManagedObject] {
-//                self.container.viewContext.delete(data)
-//            }
-//            try self.container.viewContext.save()
-//            print("delete success")
-//        } catch {
-//            print("delete fail")
-//        }
-//    }
-    
-    // 코어 데이터의 값을 dataSource에 저장하는 메서드
+    // coreData에서 read and fetch
     func fetchDataSource() -> [DataSource] {
-        let fetchRequst: NSFetchRequest<PhoneBook> = PhoneBook.fetchRequest()
         do {
-            let phoneBooks = try CoreDataManger.shared.container.viewContext.fetch(fetchRequst)
+            let phoneBooks = try context.fetch(PhoneBook.fetchRequest())
             return phoneBooks.map { phoneBook in
                 DataSource(
                     name: phoneBook.name,
@@ -137,5 +89,47 @@ class CoreDataManger {
         }
         return []
     }
+    
+    // coreData에 update
+    func updateData(_ dataSource: DataSource) {
+        
+        let fetchRequset = PhoneBook.fetchRequest()
+        fetchRequset.predicate = NSPredicate(format: "name == %@", dataSource.name!)
+        
+        do {
+            let result = try context.fetch(fetchRequset)
+            
+            for data in result {
+                data.setValue(dataSource.name, forKey: PhoneBook.Key.name)
+                data.setValue(dataSource.phoneNumber, forKey: PhoneBook.Key.phoneNumber)
+                data.setValue(dataSource.profilesImage, forKey: PhoneBook.Key.profilesImage)
+            }
+            try context.save()
+            print("data update success")
+        } catch {
+            print("data update fail")
+        }
+    }
+    
+    
+    //
+    //    // coreData에서 delete
+    //    func deleteData(name: String) {
+    //
+    //        let fetchRequset = PhoneBook.fetchRequest()
+    //        fetchRequset.predicate = NSPredicate(format: "name == %@", name)
+    //
+    //        do {
+    //            let result = try self.container.viewContext.fetch(fetchRequset)
+    //
+    //            for data in result as [NSManagedObject] {
+    //                self.container.viewContext.delete(data)
+    //            }
+    //            try self.container.viewContext.save()
+    //            print("delete success")
+    //        } catch {
+    //            print("delete fail")
+    //        }
+    //    }
+        
 }
-

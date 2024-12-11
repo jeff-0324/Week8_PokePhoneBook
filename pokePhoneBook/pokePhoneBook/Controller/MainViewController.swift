@@ -9,8 +9,9 @@ import UIKit
 import SnapKit
 
 class MainViewController: UIViewController {
+    
     private let mainView = MainView()
-    private let coreData = CoreDataManger()
+    private let phoneBookViewController = PhoneBookViewController()
     
     // navigationBar button
     private let rightButton: UIBarButtonItem = {
@@ -25,6 +26,7 @@ class MainViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         mainView.loadData()
+        navigationBarSetup()
     }
     
     override func viewDidLoad() {
@@ -32,6 +34,7 @@ class MainViewController: UIViewController {
         
         configureUI()
         navigationBarSetup()
+        setTableView()
     }
     
     private func configureUI() {
@@ -61,11 +64,53 @@ extension MainViewController: PhoneBookViewControllerDelegate  {
     
     // button action
     @objc func tappedAddButton() {
-        navigationController?.pushViewController(PhoneBookViewController(), animated: true)
+        phoneBookViewController.mode = .add
+        navigationController?.pushViewController(phoneBookViewController, animated: true)
     }
     
     func didSaveData() {
         let fetchedData = CoreDataManger.shared.fetchDataSource()
             mainView.dataSource = fetchedData
+        mainView.listTableView.reloadData()
        }
+}
+
+extension MainViewController: UITableViewDataSource, UITableViewDelegate {
+    // tablveView setting
+    func setTableView() {
+        mainView.listTableView.dataSource = self
+        mainView.listTableView.delegate = self
+        mainView.listTableView.register(TableViewCell.self, forCellReuseIdentifier: "TableViewCell")
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 80
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return mainView.dataSource.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "TableViewCell", for: indexPath) as? TableViewCell else { return UITableViewCell() }
+        
+        let data = mainView.dataSource[indexPath.row]
+        cell.friendName.text = data.name
+        cell.friendNumber.text = data.phoneNumber
+        
+        if let imageData = data.profilesImage, let image = UIImage(data: imageData) {
+            cell.pokemonImageView.image = image
+        }
+        return cell
+    }
+    
+    // 특정 셀을 선택했을 때
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let data = mainView.dataSource[indexPath.row]
+        
+        phoneBookViewController.selectedData = data
+        phoneBookViewController.mode = .view
+        
+        navigationController?.pushViewController(phoneBookViewController, animated: true)
+    }
 }

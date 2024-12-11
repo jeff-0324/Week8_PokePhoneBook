@@ -7,7 +7,7 @@
 import UIKit
 import SnapKit
 
-class MainView: UIView, UITableViewDataSource, UITableViewDelegate {
+class MainView: UIView {
     
     var dataSource: [DataSource] = []
     
@@ -21,7 +21,6 @@ class MainView: UIView, UITableViewDataSource, UITableViewDelegate {
         super.init(frame: frame)
         
         configureUI()
-        setTableView()
         loadData()
     }
     
@@ -48,35 +47,6 @@ extension MainView {
         dataSource = CoreDataManger.shared.fetchDataSource()
         listTableView.reloadData()
     }
-    
-    // tablveView setting
-    func setTableView() {
-        listTableView.dataSource = self
-        listTableView.delegate = self
-        listTableView.register(TableViewCell.self, forCellReuseIdentifier: "TableViewCell")
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 80
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return dataSource.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "TableViewCell", for: indexPath) as? TableViewCell else { return UITableViewCell() }
-        
-        let data = dataSource[indexPath.row]
-        cell.friendName.text = data.name
-        cell.friendNumber.text = data.phoneNumber
-        
-        if let imageData = data.profilesImage, let image = UIImage(data: imageData) {
-            cell.pokemonImageView.image = image
-        }
-        return cell
-    }
-    
 }
 
 
