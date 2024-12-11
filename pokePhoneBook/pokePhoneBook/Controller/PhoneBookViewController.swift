@@ -23,7 +23,7 @@ class PhoneBookViewController: UIViewController {
     // navigationBar button
     private let rightApplyButton: UIBarButtonItem = {
         let barButton = UIBarButtonItem()
-        barButton.title = "적용"
+        barButton.title = "생성"
         barButton.style = .plain
         return barButton
     }()

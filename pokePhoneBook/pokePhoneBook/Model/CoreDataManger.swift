@@ -75,8 +75,10 @@ class CoreDataManger {
     
     // coreData에서 read and fetch
     func fetchDataSource() -> [DataSource] {
+        let fetchRequest = PhoneBook.fetchRequest()
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
         do {
-            let phoneBooks = try context.fetch(PhoneBook.fetchRequest())
+            let phoneBooks = try context.fetch(fetchRequest)
             return phoneBooks.map { phoneBook in
                 DataSource(
                     name: phoneBook.name,
