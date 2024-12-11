@@ -11,8 +11,6 @@ import SnapKit
 class MainViewController: UIViewController {
     
     private let mainView = MainView()
-    private let enrolView = EnrolView()
-    private let coreData = CoreDataManger()
     private let phoneBookViewController = PhoneBookViewController()
     
     // navigationBar button
@@ -66,12 +64,14 @@ extension MainViewController: PhoneBookViewControllerDelegate  {
     
     // button action
     @objc func tappedAddButton() {
+        phoneBookViewController.mode = .add
         navigationController?.pushViewController(phoneBookViewController, animated: true)
     }
     
     func didSaveData() {
         let fetchedData = CoreDataManger.shared.fetchDataSource()
             mainView.dataSource = fetchedData
+        mainView.listTableView.reloadData()
        }
 }
 
@@ -108,9 +108,9 @@ extension MainViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let data = mainView.dataSource[indexPath.row]
         
-        let phoneBookVC = PhoneBookViewController()
-        phoneBookVC.selectedData = data
+        phoneBookViewController.selectedData = data
+        phoneBookViewController.mode = .view
         
-        navigationController?.pushViewController(phoneBookVC, animated: true)
+        navigationController?.pushViewController(phoneBookViewController, animated: true)
     }
 }
