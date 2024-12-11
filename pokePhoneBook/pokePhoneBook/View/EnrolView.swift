@@ -15,6 +15,7 @@ class EnrolView: UIView {
     
     // 클로저를 통한 버튼구현
     var tappedMakeImageButton: (() -> Void)?
+    var tappedDeleteButton: (() -> Void)?
     
     var pokemonImageView: UIImageView = {
         let imageView = UIImageView()
@@ -52,11 +53,20 @@ class EnrolView: UIView {
         textField.returnKeyType = .done
         return textField
     }()
+    
+    let deleteButton: UIButton = {
+        let button = UIButton()
+        button.setTitle("연락처 삭제", for: .normal)
+        button.setTitleColor(.red, for: .normal)
+        button.layer.cornerRadius = 10
+        button.backgroundColor = .lightGray
+        button.titleLabel?.font = .boldSystemFont(ofSize: 20)
+        return button
+    }()
         
     //MARK: - setting
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
         configureUI()
     }
     
@@ -71,7 +81,8 @@ class EnrolView: UIView {
             pokemonImageView,
             creatImageButton,
             nameTextField,
-            phoneNumeberTextField
+            phoneNumeberTextField,
+            deleteButton
         ].forEach { addSubview($0) }
         
         pokemonImageView.snp.makeConstraints { make in
@@ -100,9 +111,17 @@ class EnrolView: UIView {
             make.height.equalTo(50)
         }
         
+        deleteButton.snp.makeConstraints { make in
+            make.top.equalTo(phoneNumeberTextField.snp.bottom).offset(200)
+            make.centerX.equalToSuperview()
+            make.height.equalTo(60)
+            make.width.equalTo(300)
+        }
+        
         nameTextField.delegate = self
         phoneNumeberTextField.delegate = self
-        creatImageButton.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+        creatImageButton.addTarget(self, action: #selector(makeImageAction), for: .touchUpInside)
+        deleteButton.addTarget(self, action: #selector(deleteAction), for: .touchUpInside)
     }
 }
 
@@ -110,8 +129,12 @@ class EnrolView: UIView {
 extension EnrolView: UITextFieldDelegate {
     
     // 이미지 생성 버튼 메서드
-    @objc func buttonTapped() {
+    @objc func makeImageAction() {
         tappedMakeImageButton?()
+    }
+    
+    @objc func deleteAction() {
+        tappedDeleteButton?()
     }
     
     // 텍스트 필드에 있는 값을 변수에 저장

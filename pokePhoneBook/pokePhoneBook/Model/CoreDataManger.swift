@@ -75,8 +75,10 @@ class CoreDataManger {
     
     // coreData에서 read and fetch
     func fetchDataSource() -> [DataSource] {
+        let fetchRequest = PhoneBook.fetchRequest()
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
         do {
-            let phoneBooks = try context.fetch(PhoneBook.fetchRequest())
+            let phoneBooks = try context.fetch(fetchRequest)
             return phoneBooks.map { phoneBook in
                 DataSource(
                     name: phoneBook.name,
@@ -111,25 +113,23 @@ class CoreDataManger {
         }
     }
     
+        // coreData에서 delete
+        func deleteData(name: String?) {
+            guard let name = name else { return }
+            let fetchRequset = PhoneBook.fetchRequest()
+            fetchRequset.predicate = NSPredicate(format: "name == %@", name)
     
-    //
-    //    // coreData에서 delete
-    //    func deleteData(name: String) {
-    //
-    //        let fetchRequset = PhoneBook.fetchRequest()
-    //        fetchRequset.predicate = NSPredicate(format: "name == %@", name)
-    //
-    //        do {
-    //            let result = try self.container.viewContext.fetch(fetchRequset)
-    //
-    //            for data in result as [NSManagedObject] {
-    //                self.container.viewContext.delete(data)
-    //            }
-    //            try self.container.viewContext.save()
-    //            print("delete success")
-    //        } catch {
-    //            print("delete fail")
-    //        }
-    //    }
+            do {
+                let result = try context.fetch(fetchRequset)
+    
+                for data in result {
+                    self.context.delete(data)
+                }
+                try context.save()
+                print("delete success")
+            } catch {
+                print("delete fail")
+            }
+        }
         
 }
