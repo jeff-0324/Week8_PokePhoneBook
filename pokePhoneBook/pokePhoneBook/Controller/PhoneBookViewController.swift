@@ -15,6 +15,7 @@ protocol PhoneBookViewControllerDelegate: AnyObject {
 class PhoneBookViewController: UIViewController {
     private let enrolView = EnrolView()
     private let profilesImageManager = ProfilesImageManager()
+    var selectedData: DataSource?
     
     weak var delegate: PhoneBookViewControllerDelegate?
     
@@ -37,6 +38,17 @@ class PhoneBookViewController: UIViewController {
     private func configureUI() {
         view.addSubview(enrolView)
         
+        if let data = selectedData {
+            enrolView.nameTextField.text = data.name
+            enrolView.phoneNumeberTextField.text = data.phoneNumber
+            if let imageData = data.profilesImage, let image = UIImage(data: imageData) {
+                enrolView.pokemonImageView.image = image
+            }
+            self.navigationItem.title = data.name
+        } else {
+             navigationItem.title = "연락처 추가"
+        }
+        
         enrolView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
@@ -48,7 +60,7 @@ extension PhoneBookViewController {
     
     // navigation bar setup
     private func navigationBarSetup() {
-        navigationItem.title = "연락처 추가"
+        
         navigationItem.rightBarButtonItem = rightButton
         
         rightButton.target = self

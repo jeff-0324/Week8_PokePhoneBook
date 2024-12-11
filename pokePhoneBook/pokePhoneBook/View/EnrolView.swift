@@ -16,7 +16,7 @@ class EnrolView: UIView {
     // 클로저를 통한 버튼구현
     var tappedMakeImageButton: (() -> Void)?
     
-    let pokemonImageView: UIImageView = {
+    var pokemonImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.layer.borderWidth = 2
         imageView.layer.borderColor = UIColor.gray.cgColor
@@ -32,7 +32,7 @@ class EnrolView: UIView {
         return button
     }()
     
-    private var nameTextField: UITextField = {
+     var nameTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "이름을 입력해주세요"
         textField.layer.borderWidth = 1
@@ -42,7 +42,7 @@ class EnrolView: UIView {
         textField.returnKeyType = .done
         return textField
     }()
-    private var phoneNumeberTextField: UITextField = {
+     var phoneNumeberTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "전화번호를 입력해주세요"
         textField.layer.borderWidth = 1
