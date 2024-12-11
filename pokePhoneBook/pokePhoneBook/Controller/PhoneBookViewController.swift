@@ -70,6 +70,13 @@ extension PhoneBookViewController {
                 }
             }
         }
+        
+        enrolView.tappedDeleteButton = { [weak self] in
+            guard let self = self else { return }
+            CoreDataManger.shared.deleteData(name: selectedData?.name)
+            delegate?.didSaveData()
+            navigationController?.popViewController(animated: true)
+        }
     }
     
     // 추가 버튼을 눌렀을 때 add모드
@@ -85,7 +92,7 @@ extension PhoneBookViewController {
             make.edges.equalToSuperview()
         }
         addModeRightButton()
-        
+        enrolView.deleteButton.isHidden = true
     }
     
     // 테이블뷰 셀을 눌렀을 때 view모드
@@ -107,6 +114,7 @@ extension PhoneBookViewController {
         enrolView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
+        enrolView.deleteButton.isHidden = false
     }
     
     private func addModeRightButton() {
