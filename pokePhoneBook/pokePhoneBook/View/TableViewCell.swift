@@ -10,7 +10,8 @@ import SnapKit
 
 class TableViewCell: UITableViewCell {
     
-    var pokemonImageView: UIImageView = {
+    // 프로필 이미지 뷰
+    var profilesImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.clipsToBounds = true
         imageView.layer.cornerRadius = 30
@@ -19,22 +20,23 @@ class TableViewCell: UITableViewCell {
         return imageView
     }()
     
-    var friendName: UILabel = {
+    // 이름 라벨
+    var name: UILabel = {
         let label = UILabel()
         label.textAlignment = .left
         return label
     }()
     
-    var friendNumber: UILabel = {
+    // 전화번호 라벨
+    var phoneNumber: UILabel = {
         let label = UILabel()
         label.textAlignment = .center
         return label
     }()
     
-//MARK: - setting
+    //MARK: - setting
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
         configureUI()
     }
     
@@ -42,30 +44,32 @@ class TableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    
     private func configureUI() {
         [
-            pokemonImageView,
-            friendName,
-            friendNumber
-        ].forEach{contentView.addSubview($0)}
+            profilesImageView,
+            name,
+            phoneNumber
+        ].forEach{ contentView.addSubview($0) }
         
-        pokemonImageView.snp.makeConstraints { make in
+        // 포켓몬 이미지 뷰 Layout
+        profilesImageView.snp.makeConstraints { make in
             make.width.height.equalTo(60)
             make.leading.equalToSuperview().offset(10)
             make.centerY.equalToSuperview()
         }
         
-        friendName.snp.makeConstraints { make in
+        //  이름 라벨 Layout
+        name.snp.makeConstraints { make in
             make.width.equalTo(70)
             make.centerY.equalToSuperview()
-            make.leading.equalTo(pokemonImageView.snp.trailing).offset(20)
+            make.leading.equalTo(profilesImageView.snp.trailing).offset(20)
         }
         
-        friendNumber.snp.makeConstraints { make in
+        // 전화번호 라벨 Layout
+        phoneNumber.snp.makeConstraints { make in
             make.width.equalTo(150)
             make.centerY.equalToSuperview()
-            make.leading.equalTo(friendName.snp.trailing).offset(30)
+            make.leading.equalTo(name.snp.trailing).offset(30)
         }
     }
 }

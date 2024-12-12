@@ -10,38 +10,12 @@ import CoreData
 
 class CoreDataManger {
     
-    // 싱글톤 형식으로 사용
+    // 싱글톤으로 생성
     static let shared = CoreDataManger()
-    
-    // 코어 데이터 삭제
-    //        lazy var persistentContainer: NSPersistentContainer = {
-    //            let container = NSPersistentContainer(name: "pokePhoneBook")
-    //
-    //            // 기존 스토어 삭제
-    //            if let storeURL = container.persistentStoreDescriptions.first?.url {
-    //                let fileManager = FileManager.default
-    //                if fileManager.fileExists(atPath: storeURL.path) {
-    //                    do {
-    //                        try fileManager.removeItem(at: storeURL)
-    //                        print("Existing Core Data store deleted.")
-    //                    } catch {
-    //                        print("Failed to delete store: \(error)")
-    //                    }
-    //                }
-    //            }
-    //
-    //            container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-    //                if let error = error as NSError? {
-    //                    fatalError("Unresolved error \(error), \(error.userInfo)")
-    //                }
-    //            })
-    //            return container
-    //        }()
-    //
     
     init() {}
     
-    // CoreData 세팅
+    // CoreData 세팅 (인스턴스에 접근하기 쉽게 변수에 랩핑)
     var container: NSPersistentContainer {
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         return appDelegate.persistentContainer
@@ -50,6 +24,7 @@ class CoreDataManger {
     var context: NSManagedObjectContext {
         return container.viewContext
     }
+    
     var phoneBookEntity: NSEntityDescription? {
         return NSEntityDescription.entity(forEntityName: PhoneBook.className, in: context)
     }
@@ -62,39 +37,43 @@ class CoreDataManger {
         }
     }
     
-    // coreData에 create
+//MARK: - CRUD 메서드
+    // Create 메서드
     func createData(_ dataSource: DataSource) {
         guard let entity = phoneBookEntity else { return }
-        
-        let newPhoneBook = NSManagedObject(entity: entity, insertInto: context)
-        newPhoneBook.setValue(dataSource.name, forKey: PhoneBook.Key.name)
-        newPhoneBook.setValue(dataSource.phoneNumber, forKey: PhoneBook.Key.phoneNumber)
-        newPhoneBook.setValue(dataSource.profilesImage, forKey: PhoneBook.Key.profilesImage)
-        saveContext()
+        do {
+            let newPhoneBook = NSManagedObject(entity: entity, insertInto: context)
+            newPhoneBook.setValue(dataSource.name, forKey: PhoneBook.Key.name)
+            newPhoneBook.setValue(dataSource.phoneNumber, forKey: PhoneBook.Key.phoneNumber)
+            newPhoneBook.setValue(dataSource.profilesImage, forKey: PhoneBook.Key.profilesImage)
+            try context.save()
+            print("데이터 생성 성공")
+        } catch {
+            print("데이터 생성 실패")
+        }
     }
     
-    // coreData에서 read and fetch
+    // Read & Fetch 메서드
     func fetchDataSource() -> [DataSource] {
+        // NSSortDescriptor을 이용해 오름차순으로 정렬
         let fetchRequest = PhoneBook.fetchRequest()
-            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
+        
         do {
             let phoneBooks = try context.fetch(fetchRequest)
             return phoneBooks.map { phoneBook in
-                DataSource(
-                    name: phoneBook.name,
-                    phoneNumber: phoneBook.phoneNumber,
-                    profilesImage: phoneBook.profilesImage
-                )
+                DataSource( name: phoneBook.name,
+                            phoneNumber: phoneBook.phoneNumber,
+                            profilesImage: phoneBook.profilesImage )
             }
         } catch {
-            print("data read failure")
+            print("데이터 불러오기 실패")
         }
         return []
     }
     
-    // coreData에 update
+    // Update 메서드
     func updateData(_ dataSource: DataSource) {
-        
         let fetchRequset = PhoneBook.fetchRequest()
         fetchRequset.predicate = NSPredicate(format: "name == %@", dataSource.name!)
         
@@ -107,29 +86,28 @@ class CoreDataManger {
                 data.setValue(dataSource.profilesImage, forKey: PhoneBook.Key.profilesImage)
             }
             try context.save()
-            print("data update success")
+            print("데이터 업데이트 성공")
         } catch {
-            print("data update fail")
+            print("데이터 업데이트 실패")
         }
     }
     
-        // coreData에서 delete
-        func deleteData(name: String?) {
-            guard let name = name else { return }
-            let fetchRequset = PhoneBook.fetchRequest()
-            fetchRequset.predicate = NSPredicate(format: "name == %@", name)
-    
-            do {
-                let result = try context.fetch(fetchRequset)
-    
-                for data in result {
-                    self.context.delete(data)
-                }
-                try context.save()
-                print("delete success")
-            } catch {
-                print("delete fail")
-            }
-        }
+    // Delete 메서드
+    func deleteData(name: String?) {
+        guard let name = name else { return }
+        let fetchRequset = PhoneBook.fetchRequest()
+        fetchRequset.predicate = NSPredicate(format: "name == %@", name)
         
+        do {
+            let result = try context.fetch(fetchRequset)
+            
+            for data in result {
+                self.context.delete(data)
+            }
+            try context.save()
+            print("데이터 삭제 성공")
+        } catch {
+            print("데이터 삭제 실패")
+        }
+    }
 }
