@@ -13,7 +13,7 @@ class MainViewController: UIViewController {
     private let mainView = MainView()
     private let phoneBookViewController = PhoneBookViewController()
     
-    // navigationBar button
+    // 네비게이션 바 버튼
     private let rightButton: UIBarButtonItem = {
         let barButton = UIBarButtonItem()
         barButton.title = "추가"
@@ -22,19 +22,18 @@ class MainViewController: UIViewController {
         return barButton
     }()
     
-//MARK: - setting
+    //MARK: - setting
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        configureUI()
+        navigationBarSetup()
+        setTableView()
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         mainView.loadData()
         navigationBarSetup()
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        configureUI()
-        navigationBarSetup()
-        setTableView()
     }
     
     private func configureUI() {
@@ -52,62 +51,70 @@ class MainViewController: UIViewController {
 }
 
 //MARK: - 메서드 부분
-extension MainViewController: PhoneBookViewControllerDelegate  {
+extension MainViewController {
     
+    // 네비게이션바 타이틀과 버튼 추가
     private func navigationBarSetup() {
         navigationItem.title = "친구 목록"
         navigationItem.rightBarButtonItem = rightButton
-        
         rightButton.target = self
         rightButton.action = #selector(tappedAddButton)
     }
     
-    // button action
+    // 추가 버튼을 눌렀을 때
     @objc func tappedAddButton() {
         phoneBookViewController.mode = .add
         navigationController?.pushViewController(phoneBookViewController, animated: true)
     }
-    
-    func didSaveData() {
-        let fetchedData = CoreDataManger.shared.fetchDataSource()
-            mainView.dataSource = fetchedData
-        mainView.listTableView.reloadData()
-       }
 }
 
+//MARK: - Delegate Part
+extension MainViewController: PhoneBookViewControllerDelegate  {
+    
+    // fetch한 데이터를 dataSource에 추가 후 reload
+    func didSaveData() {
+        let fetchedData = CoreDataManger.shared.fetchDataSource()
+        mainView.dataSource = fetchedData
+        mainView.listTableView.reloadData()
+    }
+}
+
+//MARK: - TableView Part
 extension MainViewController: UITableViewDataSource, UITableViewDelegate {
-    // tablveView setting
+    
+    // 테이블뷰 setting
     func setTableView() {
         mainView.listTableView.dataSource = self
         mainView.listTableView.delegate = self
         mainView.listTableView.register(TableViewCell.self, forCellReuseIdentifier: "TableViewCell")
     }
     
+    // 테이블뷰 셀 높이
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 80
     }
     
+    // 테이블뷰 셀 갯수
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return mainView.dataSource.count
     }
     
+    // 테이블뷰 셀 구성
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "TableViewCell", for: indexPath) as? TableViewCell else { return UITableViewCell() }
         
         let data = mainView.dataSource[indexPath.row]
-        cell.friendName.text = data.name
-        cell.friendNumber.text = data.phoneNumber
+        cell.name.text = data.name
+        cell.phoneNumber.text = data.phoneNumber
         
-        if let imageData = data.profilesImage, let image = UIImage(data: imageData) {
-            cell.pokemonImageView.image = image
-        }
+        guard let imageData = data.profilesImage, let image = UIImage(data: imageData)  else { return cell }
+        cell.profilesImageView.image = image
         return cell
     }
     
     // 특정 셀을 선택했을 때
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let data = mainView.dataSource[indexPath.row]
-        
         phoneBookViewController.selectedData = data
         phoneBookViewController.mode = .view
         

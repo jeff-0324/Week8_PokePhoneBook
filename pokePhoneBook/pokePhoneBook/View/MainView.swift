@@ -9,18 +9,19 @@ import SnapKit
 
 class MainView: UIView {
     
+    // API를 통해 받아온 데이터를 저장
     var dataSource: [DataSource] = []
     
+    // 테이블 뷰
     let listTableView: UITableView  = {
         let tableView = UITableView()
         return tableView
     }()
-  
-//MARK: - setting
+    
+    //MARK: - setting
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
-        configureUI()
+        setupUI()
         loadData()
     }
     
@@ -28,11 +29,12 @@ class MainView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func configureUI() {
+    private func setupUI() {
         backgroundColor = .white
         
         addSubview(listTableView)
         
+        // 테이블 뷰 Layout
         listTableView.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.leading.trailing.bottom.equalToSuperview().inset(30)
@@ -43,6 +45,7 @@ class MainView: UIView {
 //MARK: - method Part
 extension MainView {
     
+    // 테이블 뷰 reload
     func loadData() {
         dataSource = CoreDataManger.shared.fetchDataSource()
         listTableView.reloadData()
